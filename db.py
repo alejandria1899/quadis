@@ -119,3 +119,34 @@ def list_movements_between(start_iso: str, end_iso: str):
     ).fetchall()
     conn.close()
     return rows
+
+
+def get_movement(movement_id: int):
+    conn = get_conn()
+    row = conn.execute(
+        "SELECT id, movement_name, comment, ts, hhmmss FROM movements WHERE id = ?",
+        (movement_id,),
+    ).fetchone()
+    conn.close()
+    return row
+
+
+def update_movement(movement_id: int, movement_name: str, comment: str | None):
+    conn = get_conn()
+    conn.execute(
+        """
+        UPDATE movements
+        SET movement_name = ?, comment = ?
+        WHERE id = ?
+        """,
+        ((movement_name or "").strip(), (comment or "").strip(), movement_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def delete_movement(movement_id: int):
+    conn = get_conn()
+    conn.execute("DELETE FROM movements WHERE id = ?", (movement_id,))
+    conn.commit()
+    conn.close()
