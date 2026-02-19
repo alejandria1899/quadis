@@ -1,6 +1,9 @@
 import os
 import sqlite3
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
+MADRID = ZoneInfo("Europe/Madrid")
 
 DB_DIR = "data"
 DB_PATH = os.path.join(DB_DIR, "app.db")
@@ -31,8 +34,8 @@ def init_db():
         movement_type_id INTEGER NOT NULL,
         movement_name TEXT NOT NULL,
         comment TEXT,
-        ts TEXT NOT NULL,
-        hhmmss TEXT NOT NULL,
+        ts TEXT NOT NULL,      -- ISO datetime (with TZ)
+        hhmmss TEXT NOT NULL,  -- HH:MM:SS
         FOREIGN KEY(movement_type_id) REFERENCES movement_types(id)
     )
     """)
@@ -57,7 +60,7 @@ def add_movement_type(name: str):
     try:
         conn.execute(
             "INSERT INTO movement_types(name, created_at) VALUES(?, ?)",
-            (name, datetime.now().isoformat(timespec="seconds")),
+            (name, datetime.now(MADRID).isoformat(timespec="seconds")),
         )
         conn.commit()
         return True, None
@@ -75,7 +78,7 @@ def delete_movement_type(movement_type_id: int):
 
 
 def add_movement(movement_type_id: int, movement_name: str, comment: str | None):
-    now = datetime.now()
+    now = datetime.now(MADRID)
     ts = now.isoformat(timespec="seconds")
     hhmmss = now.strftime("%H:%M:%S")
 

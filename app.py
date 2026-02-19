@@ -1,9 +1,12 @@
 import math
 import streamlit as st
 from datetime import datetime, date, time
+from zoneinfo import ZoneInfo
 
 import db
 from pdf_export import build_pdf
+
+MADRID = ZoneInfo("Europe/Madrid")
 
 st.set_page_config(
     page_title="Movimientos Almacén",
@@ -24,13 +27,13 @@ if "selected_type_id" not in st.session_state:
 if "selected_type_name" not in st.session_state:
     st.session_state.selected_type_name = None
 
-# para Dist. car.
+# Dist. car. selections
 if "dist_car_carro" not in st.session_state:
     st.session_state.dist_car_carro = None
 if "dist_car_zona" not in st.session_state:
     st.session_state.dist_car_zona = None
 
-# para editar
+# Edit movement
 if "edit_movement_id" not in st.session_state:
     st.session_state.edit_movement_id = None
 
@@ -38,6 +41,10 @@ if "edit_movement_id" not in st.session_state:
 def go(screen: str):
     st.session_state.screen = screen
     st.rerun()
+
+
+def is_dist_car(name: str) -> bool:
+    return (name or "").strip().lower() == "dist. car.".lower()
 
 
 # ---------------------------
@@ -54,6 +61,7 @@ st.markdown("""
     padding-bottom: 4rem !important;
 }
 
+/* Botones compactos */
 div.stButton > button {
     width: 100%;
     padding: 0.42rem 0.45rem !important;
@@ -64,6 +72,7 @@ div.stButton > button {
     text-overflow: ellipsis;
 }
 
+/* Columnas: evita que se apilen */
 div[data-testid="stHorizontalBlock"]{
     flex-wrap: nowrap !important;
     gap: 0.35rem !important;
@@ -121,7 +130,6 @@ if st.session_state.screen == "home":
                             st.session_state.selected_type_id = int(t["id"])
                             st.session_state.selected_type_name = t["name"]
 
-                            # reset dist car selections
                             st.session_state.dist_car_carro = None
                             st.session_state.dist_car_zona = None
 
@@ -130,7 +138,7 @@ if st.session_state.screen == "home":
 
     st.divider()
 
-    # Historial (con editar / eliminar)
+    # Historial (editar / eliminar)
     with st.expander("📜 Historial (editar / eliminar)", expanded=False):
         rows = db.list_movements(limit=60)
         if not rows:
@@ -155,7 +163,7 @@ if st.session_state.screen == "home":
 
 
 # ============================================================
-# COMMENT (incluye Dist. car. con Carro/Zona)
+# COMMENT
 # ============================================================
 elif st.session_state.screen == "comment":
     name = st.session_state.selected_type_name
@@ -168,14 +176,13 @@ elif st.session_state.screen == "comment":
     else:
         st.subheader(f"📝 Comentario para: {name}")
 
-        # --- ESPECIAL: Dist. car. ---
-        if name.strip().lower() == "dist. car.".lower():
+        # --- Especial Dist. car. ---
+        if is_dist_car(name):
             st.caption("Selecciona Carro y Zona (opcional).")
 
-            # Carro 1-26 (botones pequeños)
             st.markdown("**Carro (1–26)**")
             carros = list(range(1, 27))
-            carros_cols = 10  # 6 por fila (queda pequeño)
+            carros_cols = 6
             rows_c = math.ceil(len(carros) / carros_cols)
             idx = 0
             for _ in range(rows_c):
@@ -205,12 +212,11 @@ elif st.session_state.screen == "comment":
                                 st.rerun()
                         idx += 1
 
-            # mostrar selección
             carro = st.session_state.dist_car_carro
             zona = st.session_state.dist_car_zona
             st.info(f"Seleccionado → Carro: {carro if carro else '-'} | Zona: {zona if zona else '-'}")
 
-        st.caption("Se guardará con hora:minuto:segundo automáticamente.")
+        st.caption("Se guardará con hora:minuto:segundo automáticamente (Europe/Madrid).")
 
         comment = st.text_area(
             "Comentario (opcional)",
@@ -223,8 +229,7 @@ elif st.session_state.screen == "comment":
             if st.button("💾 Guardar", key="save_move"):
                 final_comment = (comment or "").strip()
 
-                # si es Dist. car., añade prefijo Carro/Zona al comentario
-                if name.strip().lower() == "dist. car.".lower():
+                if is_dist_car(name):
                     carro = st.session_state.dist_car_carro
                     zona = st.session_state.dist_car_zona
                     prefix_parts = []
@@ -272,7 +277,7 @@ elif st.session_state.screen == "edit":
                 go("home")
         else:
             st.subheader("✏️ Editar movimiento")
-            st.caption(f"Hora: {row['hhmmss']}")
+            st.caption(f"Hora guardada: {row['hhmmss']} (Europe/Madrid)")
 
             new_name = st.text_input("Nombre movimiento", value=row["movement_name"])
             new_comment = st.text_area("Comentario", value=row["comment"] or "", height=120)
@@ -297,7 +302,7 @@ elif st.session_state.screen == "edit":
 
 
 # ============================================================
-# MANAGE (crear/borrar botones)
+# MANAGE
 # ============================================================
 elif st.session_state.screen == "manage":
     st.subheader("➕ Crear botón de movimiento")
@@ -336,8 +341,8 @@ elif st.session_state.screen == "pdf":
 
     selected_day = st.date_input("Día a exportar", value=date.today())
 
-    start_dt = datetime.combine(selected_day, time(0, 0, 0))
-    end_dt = datetime.combine(selected_day, time(23, 59, 59))
+    start_dt = datetime.combine(selected_day, time(0, 0, 0), tzinfo=MADRID)
+    end_dt = datetime.combine(selected_day, time(23, 59, 59), tzinfo=MADRID)
 
     rows = db.list_movements_between(
         start_dt.isoformat(timespec="seconds"),
@@ -348,7 +353,6 @@ elif st.session_state.screen == "pdf":
 
     if rows:
         pdf_bytes = build_pdf(rows, title=f"Registro de movimientos - {selected_day.isoformat()}")
-
         st.download_button(
             label="⬇️ Descargar PDF",
             data=pdf_bytes,
