@@ -1,0 +1,233 @@
+:root{
+  --bg: #0b1220;
+  --card: rgba(255,255,255,0.06);
+  --text: rgba(255,255,255,0.92);
+  --muted: rgba(255,255,255,0.65);
+  --border: rgba(255,255,255,0.10);
+  --accent: rgba(59,130,246,1);
+  --danger: rgba(239,68,68,1);
+}
+
+*{ box-sizing: border-box; }
+body{
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app{
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+.topbar{
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, rgba(11,18,32,1), rgba(11,18,32,0.92));
+  padding: 10px 0 8px;
+  z-index: 10;
+}
+
+.title{
+  font-weight: 800;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.nav{
+  display: flex;
+  gap: 8px;
+}
+
+.nav button{
+  flex: 1;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.nav button.active{
+  border-color: rgba(59,130,246,0.8);
+  background: rgba(59,130,246,0.14);
+}
+
+h2{
+  margin: 10px 0 10px;
+  font-size: 16px;
+}
+
+.card{
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 16px;
+  padding: 12px;
+  margin: 10px 0;
+}
+
+.grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.tile{
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  border-radius: 14px;
+  padding: 10px 8px;
+  font-size: 12px;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subtitle{
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.section{ margin-top: 10px; }
+.label{
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.miniGrid{
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+.miniBtn{
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 8px 0;
+  font-size: 12px;
+}
+
+.miniActive{
+  border-color: rgba(59,130,246,0.9);
+  background: rgba(59,130,246,0.18);
+}
+
+.hint{
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.textarea{
+  width: 100%;
+  min-height: 110px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 10px;
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  outline: none;
+}
+
+.input{
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 10px;
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  outline: none;
+}
+
+.row{
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.row > *{ flex: 1; }
+
+button{
+  cursor: pointer;
+}
+
+.primary{
+  border: 1px solid rgba(59,130,246,0.9);
+  background: rgba(59,130,246,0.20);
+  color: var(--text);
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.danger{
+  border: 1px solid rgba(239,68,68,0.85);
+  background: rgba(239,68,68,0.15);
+  color: var(--text);
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.list{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.listRow{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.listText{
+  flex: 1;
+  font-size: 13px;
+}
+
+.movRow{
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.03);
+}
+
+.movMain{ flex: 1; }
+.movTitle{ font-size: 13px; }
+.time{ color: var(--muted); }
+.movComment{
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.movActions{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.movActions button{
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.muted{
+  color: var(--muted);
+  font-size: 12px;
+}
