@@ -1,0 +1,15 @@
+# Entornos virtuales
+mi_entorno/
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Base de datos local
+data/
+*.db
+
+# VS Code
+.vscode/
